@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  spark-master:
+    hostname: spark-master
+    image: semetey/spark:3.5.4-scala2.12-java17-python3-r-ubuntu-v0.2
+    entrypoint: ['entrypoint.sh', 'master']
+    ports:
+      - '8080:8080'
+      - '7077:7077'
+      - '4040:4040'
+      - '4041:4041'
+      - '4042:4042'
+      - '4043:4043'
+      - '4044:4044'
+      - '4045:4045'
+    environment:
+      - SPARK_NO_DAEMONIZE=true
+    networks:
+      - spark-network
+
+
+  spark-worker:
+    hostname: spark-worker
+    image: semetey/spark:3.5.4-scala2.12-java17-python3-r-ubuntu-v0.2
+    entrypoint: ['entrypoint.sh', 'worker']
+    environment:
+      - SPARK_MASTER=spark-master:7077
+      - SPARK_NO_DAEMONIZE=true
+    depends_on:
+      - spark-master
+    networks:
+      - spark-network
+
+      
+networks:
+  spark-network:
+    driver: bridge
